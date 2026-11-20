@@ -252,6 +252,12 @@ footer .warn{color:#fbbf24}
 .news-card h3{font-size:15px;line-height:1.8;margin:0 0 6px}
 .news-card p{color:var(--muted);font-size:13px;line-height:1.9;margin:0 0 8px}
 .news-card .nmeta{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.cat-head{display:flex;justify-content:space-between;align-items:center;margin:20px 0 10px}
+.cat-head h2{font-size:17px;margin:0}
+.view-all{background:transparent;border:1px solid var(--border);color:var(--accent2);border-radius:999px;padding:6px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.row-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.row-strip{display:flex;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.row-strip .card{flex:0 0 150px;scroll-snap-align:start}}
+.grid-title h2{font-size:18px;margin:2px 0 4px}
 .sheet-back{
   position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;display:none;
   align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);
@@ -378,6 +384,7 @@ const I18N = {
     loadError:"خطا در بارگذاری داده‌ها. لطفاً اتصال اینترنت را بررسی کنید و صفحه را تازه کنید.",
     retry:"تلاش دوباره", searchPh:"جستجوی اسم فیلم یا سریال به انگلیسی… مثلاً Chicago",
     tabMovies:"فیلم‌ها", tabSeries:"سریال‌ها", tabAnime:"انیمیشن", tabBookmarks:"نشان‌ها", tabUser:"کاربر", tabHome:"صفحه اصلی", tabNews:"اخبار",
+    catForeign:"فیلم و سریال خارجی", catKorean:"فیلم و سریال کره‌ای", catIndian:"فیلم و سریال هندی", catDubbed:"فیلم و سریال دوبله فارسی", catAnime:"انیمیشن", viewAll:"مشاهده همه",
     plot:"خلاصه داستان", newsTitle:"آخرین اخبار سینما", newsEmpty:"خبر تازه‌ای در دسترس نیست", readMore:"خواندن خبر",
     searchTitle:"جستجو", registerTitle:"ثبت‌نام", registerText:"با ایمیل و شماره موبایلت ثبت‌نام کن تا نشان‌هایت روی همین گوشی ذخیره بماند.",
     emailPh:"ایمیل", phonePh:"شماره موبایل", registerBtn:"ثبت‌نام", logout:"خروج از حساب",
@@ -404,6 +411,7 @@ const I18N = {
     loadError:"Failed to load the data. Please check your connection and refresh the page.",
     retry:"Retry", searchPh:"Search a movie or series name in English… e.g. Chicago",
     tabMovies:"Movies", tabSeries:"Series", tabAnime:"Animation", tabBookmarks:"Bookmarks", tabUser:"Account", tabHome:"Home", tabNews:"News",
+    catForeign:"Foreign movies & series", catKorean:"Korean movies & series", catIndian:"Indian movies & series", catDubbed:"Persian-dubbed movies & series", catAnime:"Animation", viewAll:"View all",
     plot:"Synopsis", newsTitle:"Latest cinema news", newsEmpty:"No news available right now", readMore:"Read more",
     searchTitle:"Search", registerTitle:"Sign up", registerText:"Sign up with your email and phone number to keep your bookmarks saved on this device.",
     emailPh:"Email", phonePh:"Phone number", registerBtn:"Sign up", logout:"Log out",
@@ -430,6 +438,7 @@ const I18N = {
     loadError:"تعذّر تحميل البيانات. تحقق من الاتصال وحدّث الصفحة.",
     retry:"إعادة المحاولة", searchPh:"ابحث عن اسم فيلم أو مسلسل بالإنجليزية… مثل Chicago",
     tabMovies:"أفلام", tabSeries:"مسلسلات", tabAnime:"أنيميشن", tabBookmarks:"المحفوظات", tabUser:"الحساب", tabHome:"الرئيسية", tabNews:"الأخبار",
+    catForeign:"أفلام ومسلسلات أجنبية", catKorean:"أفلام ومسلسلات كورية", catIndian:"أفلام ومسلسلات هندية", catDubbed:"أفلام ومسلسلات مدبلجة بالفارسية", catAnime:"أنيميشن", viewAll:"عرض الكل",
     plot:"ملخص القصة", newsTitle:"آخر أخبار السينما", newsEmpty:"لا توجد أخبار متاحة حالياً", readMore:"قراءة الخبر",
     searchTitle:"بحث", registerTitle:"التسجيل", registerText:"سجّل ببريدك الإلكتروني ورقم هاتفك ليبقى محفوظاتك على هذا الجهاز.",
     emailPh:"البريد الإلكتروني", phonePh:"رقم الهاتف", registerBtn:"تسجيل", logout:"تسجيل الخروج",
@@ -461,7 +470,7 @@ const esc = s => String(s == null ? "" : s)
 
 /* ================= state ================= */
 let CATALOG = [];
-let state = {tab:"movies", page:1, genre:"all", query:"", view:"home"};
+let state = {tab:"movies", page:1, genre:"all", query:"", view:"home", category:null, rows:true};
 let bookmarks = new Set(JSON.parse(localStorage.getItem("cy-bookmarks") || "[]"));
 let user = JSON.parse(localStorage.getItem("cy-user") || "null");
 let heroIdx = 0, heroTimer = null, heroItems = [];
@@ -526,16 +535,59 @@ function tabItems(tab){
 }
 function currentList(){
   if (state.view === "bookmarks") return CATALOG.filter(i => bookmarks.has(i.url));
+  let base = state.category ? CATALOG.filter(i => inCat(i, state.category)) : null;
   if (state.query) {
     const q = state.query.trim().toLowerCase();
-    return CATALOG.filter(i =>
+    return (base || CATALOG).filter(i =>
       (i.title || "").toLowerCase().includes(q) ||
       (i.en_title || "").toLowerCase().includes(q) ||
       (i.fa_name || "").toLowerCase().includes(q));
   }
+  if (base) return base;
   let list = tabItems(state.tab);
   if (state.genre !== "all") list = list.filter(i => (i.genres || []).includes(state.genre));
   return list;
+}
+
+/* ================= home category rows ================= */
+const CATS = ["foreign", "korean", "indian", "dubbed", "anime"];
+const ASIAN_RE = /Korea|India|Japan|China|Turkey|Iran|Thailand|Taiwan|Hong Kong|Indonesia|Philippines|Vietnam|Russia|Ukraine|Malaysia|Singapore|Pakistan|Bangladesh|Nepal|Sri Lanka|Mongolia|Kazakhstan|Uzbekistan/;
+function inCat(it, key){
+  if (key === "korean") return (it.country || "").includes("Korea");
+  if (key === "indian") return (it.country || "").includes("India");
+  if (key === "anime") return (it.genres || []).some(g => g === "انیمه" || g === "انیمیشن");
+  if (key === "dubbed") return (it.qualities || []).some(q => (q.label || "").includes("دوبله")) ||
+    (it.seasons || []).some(s => (s.qualities || []).some(q => (q.label || "").includes("دوبله")));
+  if (key === "foreign") return !!it.country && !ASIAN_RE.test(it.country);
+  return false;
+}
+function catTitle(key){ return t("cat" + key[0].toUpperCase() + key.slice(1)); }
+function catIcon(key){ return {foreign:"🌍", korean:"🇰🇷", indian:"🇮🇳", dubbed:"🎙️", anime:"✨"}[key] || "🎬"; }
+function renderHomeRows(){
+  pager.innerHTML = "";
+  chipsBox.innerHTML = "";
+  grid.innerHTML = CATS.map(key => {
+    const items = CATALOG.filter(i => inCat(i, key)).slice(0, 5);
+    if (!items.length) return "";
+    return `<section class="cat-row" style="grid-column:1/-1">
+      <div class="cat-head"><h2>${catIcon(key)} ${esc(catTitle(key))}</h2>
+      <button class="view-all" data-cat="${key}">${esc(t("viewAll"))} ›</button></div>
+      <div class="row-strip">${items.map(cardHTML).join("")}</div>
+    </section>`;
+  }).join("");
+  grid.querySelectorAll(".card").forEach(c => c.addEventListener("click", e => {
+    if (e.target.closest("[data-bm]")) return;
+    openModal(c.dataset.url);
+  }));
+  grid.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", e => {
+    e.stopPropagation();
+    toggleBookmark(b.dataset.bm);
+  }));
+  grid.querySelectorAll("[data-cat]").forEach(b => b.addEventListener("click", () => {
+    state.category = b.dataset.cat; state.rows = false; state.page = 1; state.genre = "all"; state.query = "";
+    renderAll();
+    window.scrollTo({top: 0, behavior: "smooth"});
+  }));
 }
 function tabGenres(tab){
   const seen = new Map();
@@ -547,22 +599,24 @@ function tabGenres(tab){
 
 /* ================= rendering ================= */
 function renderDock(){
-  const landing = state.view === "home" && state.tab === "movies" && state.page === 1 && state.genre === "all" && !state.query;
+  const landing = state.view === "home" && state.rows && state.tab === "movies" && state.page === 1 && state.genre === "all" && !state.query && !state.category;
   const active = state.view === "news" ? "news" : (landing ? "home" : state.tab);
   document.querySelectorAll("#dock [data-dock]").forEach(b =>
     b.classList.toggle("active", b.dataset.dock === active));
 }
 document.querySelectorAll("#dock [data-dock]").forEach(b => b.addEventListener("click", () => {
   const key = b.dataset.dock;
-  if (key === "news"){ state.view = "news"; renderAll(); window.scrollTo({top: 0, behavior: "smooth"}); return; }
+  if (key === "news"){ state.view = "news"; state.category = null; renderAll(); window.scrollTo({top: 0, behavior: "smooth"}); return; }
   state.view = "home";
+  state.rows = (key === "home");
   state.tab = key === "home" ? "movies" : key;
+  state.category = null;
   state.page = 1; state.genre = "all"; state.query = "";
   renderAll();
   window.scrollTo({top: 0, behavior: "smooth"});
 }));
 function renderChips(){
-  if (state.view !== "home" || state.query){ chipsBox.innerHTML = ""; return; }
+  if (state.view !== "home" || state.query || state.category || state.rows){ chipsBox.innerHTML = ""; return; }
   const genres = tabGenres(state.tab);
   if (!genres.length){ chipsBox.innerHTML = ""; return; }
   chipsBox.innerHTML = `<button class="chip${state.genre === "all" ? " active" : ""}" data-g="all">${esc(t("all"))}</button>` +
@@ -598,10 +652,11 @@ function renderGrid(){
   const per = 10, pages = Math.max(1, Math.ceil(list.length / per));
   if (state.page > pages) state.page = pages;
   const slice = list.slice((state.page - 1) * per, state.page * per);
+  const title = state.category ? `<div class="grid-title" style="grid-column:1/-1"><h2>${catIcon(state.category)} ${esc(catTitle(state.category))}</h2></div>` : "";
   if (!slice.length){
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">${esc(state.view === "bookmarks" ? t("noBookmarks") : t("noResults"))}</div>`;
+    grid.innerHTML = title + `<div class="empty" style="grid-column:1/-1">${esc(state.view === "bookmarks" ? t("noBookmarks") : t("noResults"))}</div>`;
   } else {
-    grid.innerHTML = slice.map(cardHTML).join("");
+    grid.innerHTML = title + slice.map(cardHTML).join("");
     grid.querySelectorAll(".card").forEach(c => c.addEventListener("click", e => {
       if (e.target.closest("[data-bm]")) return;
       openModal(c.dataset.url);
@@ -731,6 +786,7 @@ function renderAll(){
   renderDock(); renderChips();
   if (state.view === "user") renderUserView();
   else if (state.view === "news") renderNewsView();
+  else if (state.view === "home" && state.rows && !state.category && !state.query) renderHomeRows();
   else renderGrid();
 }
 
