@@ -340,8 +340,7 @@ footer .warn{color:#fbbf24}
   <button data-dock="series"><span class="ic">📺</span><span data-i18n="tabSeries">سریال‌ها</span></button>
   <button class="dock-fab" id="searchFab" aria-label="search">🔍</button>
   <button data-dock="anime"><span class="ic">✨</span><span data-i18n="tabAnime">انیمیشن</span></button>
-  <button data-dock="bookmarks"><span class="ic">🔖</span><span data-i18n="tabBookmarks">نشان‌ها</span></button>
-  <button data-dock="user"><span class="ic">👤</span><span data-i18n="tabUser">کاربر</span></button>
+  <button data-dock="home"><span class="ic">🏠</span><span data-i18n="tabHome">صفحه اصلی</span></button>
 </nav>
 
 <div class="sheet-back" id="searchSheet">
@@ -364,7 +363,7 @@ const I18N = {
     loading:"در حال بارگذاری کاتالوگ…",
     loadError:"خطا در بارگذاری داده‌ها. لطفاً اتصال اینترنت را بررسی کنید و صفحه را تازه کنید.",
     retry:"تلاش دوباره", searchPh:"جستجوی اسم فیلم یا سریال به انگلیسی… مثلاً Chicago",
-    tabMovies:"فیلم‌ها", tabSeries:"سریال‌ها", tabAnime:"انیمیشن", tabBookmarks:"نشان‌ها", tabUser:"کاربر",
+    tabMovies:"فیلم‌ها", tabSeries:"سریال‌ها", tabAnime:"انیمیشن", tabBookmarks:"نشان‌ها", tabUser:"کاربر", tabHome:"صفحه اصلی",
     searchTitle:"جستجو", registerTitle:"ثبت‌نام", registerText:"با ایمیل و شماره موبایلت ثبت‌نام کن تا نشان‌هایت روی همین گوشی ذخیره بماند.",
     emailPh:"ایمیل", phonePh:"شماره موبایل", registerBtn:"ثبت‌نام", logout:"خروج از حساب",
     yourBookmarks:"نشان‌های من", welcomeUser:"خوش برگشتی 👋", invalidEmail:"ایمیل معتبر نیست", invalidPhone:"شماره موبایل معتبر نیست", registered:"ثبت‌نام انجام شد ✓",
@@ -389,7 +388,7 @@ const I18N = {
     loading:"Loading the catalog…",
     loadError:"Failed to load the data. Please check your connection and refresh the page.",
     retry:"Retry", searchPh:"Search a movie or series name in English… e.g. Chicago",
-    tabMovies:"Movies", tabSeries:"Series", tabAnime:"Animation", tabBookmarks:"Bookmarks", tabUser:"Account",
+    tabMovies:"Movies", tabSeries:"Series", tabAnime:"Animation", tabBookmarks:"Bookmarks", tabUser:"Account", tabHome:"Home",
     searchTitle:"Search", registerTitle:"Sign up", registerText:"Sign up with your email and phone number to keep your bookmarks saved on this device.",
     emailPh:"Email", phonePh:"Phone number", registerBtn:"Sign up", logout:"Log out",
     yourBookmarks:"My bookmarks", welcomeUser:"Welcome back 👋", invalidEmail:"Invalid email", invalidPhone:"Invalid phone number", registered:"Signed up ✓",
@@ -414,7 +413,7 @@ const I18N = {
     loading:"جارٍ تحميل الكتالوج…",
     loadError:"تعذّر تحميل البيانات. تحقق من الاتصال وحدّث الصفحة.",
     retry:"إعادة المحاولة", searchPh:"ابحث عن اسم فيلم أو مسلسل بالإنجليزية… مثل Chicago",
-    tabMovies:"أفلام", tabSeries:"مسلسلات", tabAnime:"أنيميشن", tabBookmarks:"المحفوظات", tabUser:"الحساب",
+    tabMovies:"أفلام", tabSeries:"مسلسلات", tabAnime:"أنيميشن", tabBookmarks:"المحفوظات", tabUser:"الحساب", tabHome:"الرئيسية",
     searchTitle:"بحث", registerTitle:"التسجيل", registerText:"سجّل ببريدك الإلكتروني ورقم هاتفك ليبقى محفوظاتك على هذا الجهاز.",
     emailPh:"البريد الإلكتروني", phonePh:"رقم الهاتف", registerBtn:"تسجيل", logout:"تسجيل الخروج",
     yourBookmarks:"محفوظاتي", welcomeUser:"أهلاً بعودتك 👋", invalidEmail:"البريد الإلكتروني غير صحيح", invalidPhone:"رقم الهاتف غير صحيح", registered:"تم التسجيل ✓",
@@ -543,17 +542,15 @@ function renderStats(){
     `<div class="stat${i === 3 ? " links" : ""}"><b>${v}</b><span>${esc(l)}</span></div>`).join("");
 }
 function renderDock(){
-  const active = state.view === "bookmarks" ? "bookmarks" : state.view === "user" ? "user" : state.tab;
+  const landing = state.view === "home" && state.tab === "movies" && state.page === 1 && state.genre === "all" && !state.query;
+  const active = landing ? "home" : state.tab;
   document.querySelectorAll("#dock [data-dock]").forEach(b =>
     b.classList.toggle("active", b.dataset.dock === active));
-  const bmLabel = document.querySelector('#dock [data-dock="bookmarks"] span:last-child');
-  if (bmLabel) bmLabel.textContent = `${t("tabBookmarks")} (${num(bookmarks.size)})`;
 }
 document.querySelectorAll("#dock [data-dock]").forEach(b => b.addEventListener("click", () => {
   const key = b.dataset.dock;
-  if (key === "bookmarks"){ state.view = "bookmarks"; }
-  else if (key === "user"){ state.view = "user"; }
-  else { state.view = "home"; state.tab = key; }
+  state.view = "home";
+  state.tab = key === "home" ? "movies" : key;
   state.page = 1; state.genre = "all"; state.query = "";
   renderAll();
   window.scrollTo({top: 0, behavior: "smooth"});
