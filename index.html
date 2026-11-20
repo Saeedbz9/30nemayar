@@ -215,10 +215,70 @@ footer .warn{color:#fbbf24}
 }
 .ep-row span{flex:1}
 .toast{
-  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);z-index:200;
+  position:fixed;bottom:104px;left:50%;transform:translateX(-50%) translateY(80px);z-index:200;
   background:#111827;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:999px;
   padding:11px 22px;font-size:14px;font-weight:700;transition:transform .3s;box-shadow:var(--shadow);white-space:nowrap;
 }
+.dock{
+  position:fixed;bottom:calc(12px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);
+  z-index:60;width:min(480px,calc(100% - 20px));
+  display:flex;align-items:flex-end;gap:2px;
+  background:var(--surface);border:1px solid var(--border);border-radius:999px;
+  padding:8px 6px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:var(--shadow);
+}
+.dock button{
+  flex:1;min-width:0;background:transparent;border:0;color:var(--muted);cursor:pointer;
+  font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:4px 0;font-size:18px;
+}
+.dock button span{font-size:10px;font-weight:700;white-space:nowrap}
+.dock button.active{color:var(--text)}
+.dock button.active span{color:var(--accent2)}
+.dock-fab{
+  flex:0 0 56px !important;width:56px;height:56px;border-radius:50% !important;
+  background:linear-gradient(135deg,var(--accent),var(--accent2)) !important;color:#fff !important;
+  font-size:24px !important;justify-content:center !important;
+  margin-top:-26px;box-shadow:0 8px 20px rgba(168,85,247,.5);border:2px solid rgba(255,255,255,.35) !important;
+}
+.sheet-back{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;display:none;
+  align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);
+}
+.sheet-back.open{display:flex}
+.sheet{
+  width:100%;max-width:560px;max-height:82vh;overflow-y:auto;
+  background:var(--bg2);border:1px solid var(--border);border-bottom:0;
+  border-radius:22px 22px 0 0;padding:16px 16px 28px;animation:sheetUp .25s;
+}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sheet-head b{font-size:17px}
+.sheet-head button{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;cursor:pointer}
+.sheet input{
+  width:100%;background:var(--surface);border:1px solid var(--border);border-radius:999px;color:var(--text);
+  padding:12px 18px;font-family:inherit;font-size:15px;outline:none;margin-bottom:10px;
+}
+.sheet input:focus{border-color:var(--accent)}
+.sheet-count{font-size:13px;color:var(--muted);margin-bottom:10px}
+.sheet-results{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.user-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin-bottom:16px;backdrop-filter:blur(14px);
+}
+.user-card h2{font-size:19px;margin-bottom:4px}
+.user-card p{color:var(--muted);font-size:14px;line-height:1.9}
+.user-card input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);
+  padding:12px 14px;font-family:inherit;font-size:15px;outline:none;margin-bottom:10px;direction:ltr;text-align:left;
+}
+.user-card input:focus{border-color:var(--accent)}
+.user-card .row{display:flex;gap:8px;align-items:center;margin-top:6px}
+.user-card .avatar{
+  width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:30px;color:#fff;flex:0 0 64px;
+}
+.wrap{padding-bottom:120px}
 .toast.show{transform:translateX(-50%) translateY(0)}
 #loading,#loaderror{text-align:center;padding:70px 16px;color:var(--muted);font-size:16px;line-height:2}
 .spinner{width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 14px;animation:spin 1s linear infinite}
@@ -260,11 +320,6 @@ footer .warn{color:#fbbf24}
       <div class="hero-dots" id="heroDots"></div>
     </div>
 
-    <div class="searchbar">
-      <input type="search" id="searchInput" data-i18n-ph="searchPh" placeholder="جستجوی اسم فیلم یا سریال به انگلیسی… مثلاً Chicago">
-    </div>
-
-    <div class="tabs" id="tabs"></div>
     <div class="chips" id="chips"></div>
     <div class="grid" id="grid"></div>
     <div class="pager" id="pager"></div>
@@ -275,10 +330,26 @@ footer .warn{color:#fbbf24}
     </div>
 
     <footer>
-      <div data-i18n="footSource">منبع لینک‌ها: فیلم ۲ مدیا (myf2ms.top)</div>
-      <div data-i18n="footDate">برداشت‌شده: ۲۰ نوامبر ۲۰۲۶</div>
       <div class="warn" data-i18n="footWarn">⚠️ خطای 503: هنگام دانلود حتما فیلترشکن را خاموش نمایید</div>
     </footer>
+  </div>
+</div>
+
+<nav class="dock" id="dock">
+  <button data-dock="movies"><span class="ic">🎬</span><span data-i18n="tabMovies">فیلم‌ها</span></button>
+  <button data-dock="series"><span class="ic">📺</span><span data-i18n="tabSeries">سریال‌ها</span></button>
+  <button class="dock-fab" id="searchFab" aria-label="search">🔍</button>
+  <button data-dock="anime"><span class="ic">✨</span><span data-i18n="tabAnime">انیمیشن</span></button>
+  <button data-dock="bookmarks"><span class="ic">🔖</span><span data-i18n="tabBookmarks">نشان‌ها</span></button>
+  <button data-dock="user"><span class="ic">👤</span><span data-i18n="tabUser">کاربر</span></button>
+</nav>
+
+<div class="sheet-back" id="searchSheet">
+  <div class="sheet">
+    <div class="sheet-head"><b data-i18n="searchTitle">جستجو</b><button id="sheetClose">✕</button></div>
+    <input type="search" id="sheetInput" data-i18n-ph="searchPh" placeholder="جستجوی اسم فیلم یا سریال به انگلیسی… مثلاً Chicago">
+    <div class="sheet-count" id="sheetCount"></div>
+    <div class="sheet-results" id="sheetResults"></div>
   </div>
 </div>
 
@@ -293,7 +364,10 @@ const I18N = {
     loading:"در حال بارگذاری کاتالوگ…",
     loadError:"خطا در بارگذاری داده‌ها. لطفاً اتصال اینترنت را بررسی کنید و صفحه را تازه کنید.",
     retry:"تلاش دوباره", searchPh:"جستجوی اسم فیلم یا سریال به انگلیسی… مثلاً Chicago",
-    tabMovies:"فیلم‌ها", tabSeries:"سریال‌ها", tabAnime:"انیمیشن", tabBookmarks:"نشان‌ها",
+    tabMovies:"فیلم‌ها", tabSeries:"سریال‌ها", tabAnime:"انیمیشن", tabBookmarks:"نشان‌ها", tabUser:"کاربر",
+    searchTitle:"جستجو", registerTitle:"ثبت‌نام", registerText:"با ایمیل و شماره موبایلت ثبت‌نام کن تا نشان‌هایت روی همین گوشی ذخیره بماند.",
+    emailPh:"ایمیل", phonePh:"شماره موبایل", registerBtn:"ثبت‌نام", logout:"خروج از حساب",
+    yourBookmarks:"نشان‌های من", welcomeUser:"خوش برگشتی 👋", invalidEmail:"ایمیل معتبر نیست", invalidPhone:"شماره موبایل معتبر نیست", registered:"ثبت‌نام انجام شد ✓",
     statTitles:"عنوان", statMovies:"فیلم", statSeries:"سریال", statLinks:"لینک دانلود",
     all:"همه", prev:"قبلی", next:"بعدی", page:"صفحه", of:"از",
     heroPick:"فیلم • منتخب سردبیر", openDetails:"مشاهده و دانلود",
@@ -306,18 +380,19 @@ const I18N = {
     playing:"در حال پخش", finished:"به اتمام رسیده",
     guideTitle:"🎥 راهنمای پخش",
     guideText:"برای تماشا، لینک دانلود را کپی کنید و داخل پخش‌کننده باز کنید: VLC یا MX Player در اندروید، PotPlayer در ویندوز. پخش‌کننده داخل صفحه وجود ندارد.",
-    footSource:"منبع لینک‌ها: فیلم ۲ مدیا (myf2ms.top)",
-    footDate:"برداشت‌شده: ۲۰ نوامبر ۲۰۲۶",
     footWarn:"⚠️ خطای 503: هنگام دانلود حتما فیلترشکن را خاموش نمایید",
     searchResults:"نتایج جستجو", bookmarked:"به نشان‌ها اضافه شد ✓", unbookmarked:"از نشان‌ها حذف شد",
-    unknownYear:"—", source:"منبع"
+    unknownYear:"—"
   },
   en: {
     brand:"Cinema Yar", subtitle:"Download movies and series with direct links",
     loading:"Loading the catalog…",
     loadError:"Failed to load the data. Please check your connection and refresh the page.",
     retry:"Retry", searchPh:"Search a movie or series name in English… e.g. Chicago",
-    tabMovies:"Movies", tabSeries:"Series", tabAnime:"Animation", tabBookmarks:"Bookmarks",
+    tabMovies:"Movies", tabSeries:"Series", tabAnime:"Animation", tabBookmarks:"Bookmarks", tabUser:"Account",
+    searchTitle:"Search", registerTitle:"Sign up", registerText:"Sign up with your email and phone number to keep your bookmarks saved on this device.",
+    emailPh:"Email", phonePh:"Phone number", registerBtn:"Sign up", logout:"Log out",
+    yourBookmarks:"My bookmarks", welcomeUser:"Welcome back 👋", invalidEmail:"Invalid email", invalidPhone:"Invalid phone number", registered:"Signed up ✓",
     statTitles:"Titles", statMovies:"Movies", statSeries:"Series", statLinks:"Download links",
     all:"All", prev:"Previous", next:"Next", page:"Page", of:"of",
     heroPick:"Movie • Editor's pick", openDetails:"View & download",
@@ -330,18 +405,19 @@ const I18N = {
     playing:"Ongoing", finished:"Finished",
     guideTitle:"🎥 Playback guide",
     guideText:"To watch, copy a download link and open it in a player: VLC or MX Player on Android, PotPlayer on Windows. There is no in-page player.",
-    footSource:"Link source: Film2Media (myf2ms.top)",
-    footDate:"Scraped: 20 November 2026",
     footWarn:"⚠️ 503 error: turn off your VPN while downloading",
     searchResults:"Search results", bookmarked:"Added to bookmarks ✓", unbookmarked:"Removed from bookmarks",
-    unknownYear:"—", source:"Source"
+    unknownYear:"—"
   },
   ar: {
     brand:"سينما يار", subtitle:"تحميل الأفلام والمسلسلات بروابط مباشرة",
     loading:"جارٍ تحميل الكتالوج…",
     loadError:"تعذّر تحميل البيانات. تحقق من الاتصال وحدّث الصفحة.",
     retry:"إعادة المحاولة", searchPh:"ابحث عن اسم فيلم أو مسلسل بالإنجليزية… مثل Chicago",
-    tabMovies:"أفلام", tabSeries:"مسلسلات", tabAnime:"أنيميشن", tabBookmarks:"المحفوظات",
+    tabMovies:"أفلام", tabSeries:"مسلسلات", tabAnime:"أنيميشن", tabBookmarks:"المحفوظات", tabUser:"الحساب",
+    searchTitle:"بحث", registerTitle:"التسجيل", registerText:"سجّل ببريدك الإلكتروني ورقم هاتفك ليبقى محفوظاتك على هذا الجهاز.",
+    emailPh:"البريد الإلكتروني", phonePh:"رقم الهاتف", registerBtn:"تسجيل", logout:"تسجيل الخروج",
+    yourBookmarks:"محفوظاتي", welcomeUser:"أهلاً بعودتك 👋", invalidEmail:"البريد الإلكتروني غير صحيح", invalidPhone:"رقم الهاتف غير صحيح", registered:"تم التسجيل ✓",
     statTitles:"عنوان", statMovies:"فيلم", statSeries:"مسلسل", statLinks:"رابط تحميل",
     all:"الكل", prev:"السابق", next:"التالي", page:"صفحة", of:"من",
     heroPick:"فيلم • اختيار المحرر", openDetails:"عرض وتحميل",
@@ -354,11 +430,9 @@ const I18N = {
     playing:"يُعرض الآن", finished:"انتهى",
     guideTitle:"🎥 دليل التشغيل",
     guideText:"للمشاهدة، انسخ رابط التحميل وافتحه في مشغّل: VLC أو MX Player على أندرويد، وPotPlayer على ويندوز. لا يوجد مشغّل داخل الصفحة.",
-    footSource:"مصدر الروابط: فيلم ٢ ميديا (myf2ms.top)",
-    footDate:"تم الجمع: ٢٠ نوفمبر ٢٠٢٦",
     footWarn:"⚠️ خطأ 503: أوقف الـVPN أثناء التحميل",
     searchResults:"نتائج البحث", bookmarked:"أُضيف إلى المحفوظات ✓", unbookmarked:"أُزيل من المحفوظات",
-    unknownYear:"—", source:"المصدر"
+    unknownYear:"—"
   }
 };
 const LOCALES = {fa:"fa-IR", en:"en-US", ar:"ar-EG"};
@@ -373,11 +447,12 @@ const esc = s => String(s == null ? "" : s)
 let CATALOG = [];
 let state = {tab:"movies", page:1, genre:"all", query:"", view:"home"};
 let bookmarks = new Set(JSON.parse(localStorage.getItem("cy-bookmarks") || "[]"));
+let user = JSON.parse(localStorage.getItem("cy-user") || "null");
 let heroIdx = 0, heroTimer = null, heroItems = [];
 let modalItem = null, modalSeason = 0, modalQuality = 0;
 
 const $ = s => document.querySelector(s);
-const grid = $("#grid"), pager = $("#pager"), chipsBox = $("#chips"), tabsBox = $("#tabs");
+const grid = $("#grid"), pager = $("#pager"), chipsBox = $("#chips");
 
 function linkCount(it){
   return (it.qualities || []).length + (it.seasons || []).reduce((a, s) =>
@@ -467,22 +542,22 @@ function renderStats(){
   ].map(([v, l], i) =>
     `<div class="stat${i === 3 ? " links" : ""}"><b>${v}</b><span>${esc(l)}</span></div>`).join("");
 }
-function renderTabs(){
-  const tabs = [
-    ["movies", t("tabMovies"), tabItems("movies").length],
-    ["series", t("tabSeries"), tabItems("series").length],
-    ["anime", t("tabAnime"), tabItems("anime").length],
-    ["bookmarks", "🔖 " + t("tabBookmarks"), bookmarks.size]
-  ];
-  tabsBox.innerHTML = tabs.map(([key, label, n]) =>
-    `<button class="tab-btn${(state.view === "bookmarks" ? "bookmarks" : state.tab) === key ? " active" : ""}" data-tab="${key}">${esc(label)} (${num(n)})</button>`).join("");
-  tabsBox.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
-    if (b.dataset.tab === "bookmarks"){ state.view = "bookmarks"; }
-    else { state.view = "home"; state.tab = b.dataset.tab; }
-    state.page = 1; state.genre = "all";
-    renderAll();
-  }));
+function renderDock(){
+  const active = state.view === "bookmarks" ? "bookmarks" : state.view === "user" ? "user" : state.tab;
+  document.querySelectorAll("#dock [data-dock]").forEach(b =>
+    b.classList.toggle("active", b.dataset.dock === active));
+  const bmLabel = document.querySelector('#dock [data-dock="bookmarks"] span:last-child');
+  if (bmLabel) bmLabel.textContent = `${t("tabBookmarks")} (${num(bookmarks.size)})`;
 }
+document.querySelectorAll("#dock [data-dock]").forEach(b => b.addEventListener("click", () => {
+  const key = b.dataset.dock;
+  if (key === "bookmarks"){ state.view = "bookmarks"; }
+  else if (key === "user"){ state.view = "user"; }
+  else { state.view = "home"; state.tab = key; }
+  state.page = 1; state.genre = "all"; state.query = "";
+  renderAll();
+  window.scrollTo({top: 0, behavior: "smooth"});
+}));
 function renderChips(){
   if (state.view !== "home" || state.query){ chipsBox.innerHTML = ""; return; }
   const genres = tabGenres(state.tab);
@@ -606,20 +681,104 @@ function startHeroTimer(){
 $("#heroPrev").addEventListener("click", () => { showSlide(heroIdx - 1); startHeroTimer(); });
 $("#heroNext").addEventListener("click", () => { showSlide(heroIdx + 1); startHeroTimer(); });
 
-/* ================= search ================= */
+/* ================= search sheet ================= */
+function openSheet(){
+  $("#searchSheet").classList.add("open");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => $("#sheetInput").focus(), 100);
+}
+function closeSheet(){
+  $("#searchSheet").classList.remove("open");
+  document.body.style.overflow = "";
+  state.query = "";
+  $("#sheetInput").value = "";
+  renderAll();
+}
+$("#searchFab").addEventListener("click", openSheet);
+$("#sheetClose").addEventListener("click", closeSheet);
+$("#searchSheet").addEventListener("click", e => { if (e.target.id === "searchSheet") closeSheet(); });
 let searchTimer = null;
-$("#searchInput").addEventListener("input", e => {
+$("#sheetInput").addEventListener("input", e => {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => {
-    state.query = e.target.value;
-    state.page = 1;
-    renderAll();
-  }, 300);
+  searchTimer = setTimeout(() => renderSheetResults(e.target.value), 300);
 });
+function renderSheetResults(q){
+  state.query = q;
+  const box = $("#sheetResults"), count = $("#sheetCount");
+  const list = (q || "").trim() ? currentList() : [];
+  if (!(q || "").trim()){ box.innerHTML = ""; count.textContent = ""; return; }
+  count.textContent = `${t("searchResults")}: ${num(list.length)}`;
+  const slice = list.slice(0, 30);
+  box.innerHTML = slice.length ? slice.map(cardHTML).join("")
+    : `<div class="empty" style="grid-column:1/-1">${esc(t("noResults"))}</div>`;
+  box.querySelectorAll(".card").forEach(c => c.addEventListener("click", e => {
+    if (e.target.closest("[data-bm]")) return;
+    closeSheet();
+    openModal(c.dataset.url);
+  }));
+  box.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", e => {
+    e.stopPropagation();
+    toggleBookmark(b.dataset.bm);
+    renderSheetResults($("#sheetInput").value);
+  }));
+}
 
 function renderAll(){
   if (!CATALOG.length) return;
-  renderStats(); renderTabs(); renderChips(); renderGrid();
+  renderStats(); renderDock(); renderChips();
+  if (state.view === "user") renderUserView();
+  else renderGrid();
+}
+
+/* ================= user view ================= */
+function renderUserView(){
+  pager.innerHTML = "";
+  chipsBox.innerHTML = "";
+  if (!user){
+    grid.innerHTML = `<div class="user-card" style="grid-column:1/-1">
+      <h2>${esc(t("registerTitle"))}</h2>
+      <p>${esc(t("registerText"))}</p>
+      <div style="height:12px"></div>
+      <input type="email" id="regEmail" placeholder="${esc(t("emailPh"))}">
+      <input type="tel" id="regPhone" placeholder="${esc(t("phonePh"))}">
+      <button class="btn wide" id="regBtn">${esc(t("registerBtn"))}</button>
+    </div>`;
+    $("#regBtn").addEventListener("click", () => {
+      const email = $("#regEmail").value.trim();
+      const phone = $("#regPhone").value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast(t("invalidEmail")); return; }
+      if (phone.replace(/\D/g, "").length < 10){ toast(t("invalidPhone")); return; }
+      user = {email, phone, at: Date.now()};
+      localStorage.setItem("cy-user", JSON.stringify(user));
+      toast(t("registered"));
+      renderAll();
+    });
+    return;
+  }
+  const bmItems = CATALOG.filter(i => bookmarks.has(i.url));
+  grid.innerHTML = `<div class="user-card" style="grid-column:1/-1">
+    <div class="row"><div class="avatar">👤</div>
+      <div><h2>${esc(t("welcomeUser"))}</h2>
+      <p>${esc(user.email)}<br><span dir="ltr">${esc(user.phone)}</span></p></div>
+    </div>
+    <div class="row"><button class="btn ghost" id="logoutBtn">${esc(t("logout"))}</button></div>
+  </div>
+  <div style="grid-column:1/-1"><div class="sect">${esc(t("yourBookmarks"))} (${num(bmItems.length)})</div></div>` +
+    (bmItems.length ? bmItems.map(cardHTML).join("")
+      : `<div class="empty" style="grid-column:1/-1">${esc(t("noBookmarks"))}</div>`);
+  $("#logoutBtn").addEventListener("click", () => {
+    user = null;
+    localStorage.removeItem("cy-user");
+    renderAll();
+  });
+  grid.querySelectorAll(".card").forEach(c => c.addEventListener("click", e => {
+    if (e.target.closest("[data-bm]")) return;
+    openModal(c.dataset.url);
+  }));
+  grid.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", e => {
+    e.stopPropagation();
+    toggleBookmark(b.dataset.bm);
+  }));
 }
 
 /* ================= detail modal ================= */
@@ -696,7 +855,6 @@ function renderModal(){
       }
     }
   }
-  html += `<div style="margin-top:16px"><a href="${esc(it.url)}" target="_blank" rel="noopener" style="color:var(--muted);font-size:13px">${esc(t("source"))} ↗</a></div>`;
   html += `</div>`;
   $("#modal").innerHTML = html;
   $("#mClose").addEventListener("click", closeModal);
