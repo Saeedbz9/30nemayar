@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>سینما یار | دانلود فیلم و سریال</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0e1a; --bg2:#11152a; --surface:rgba(255,255,255,.06); --surface2:rgba(255,255,255,.1);
+  --text:#f2f4ff; --muted:#a7aecf; --border:rgba(255,255,255,.14);
+  --accent:#a855f7; --accent2:#ec4899; --accent3:#6366f1;
+  --green:#34d399; --gold:#fbbf24; --shadow:0 10px 30px rgba(0,0,0,.45);
+  --radius:18px;
+}
+html[data-theme="light"]{
+  --bg:#eef1fb; --bg2:#ffffff; --surface:rgba(255,255,255,.75); --surface2:rgba(255,255,255,.95);
+  --text:#1a2038; --muted:#5b6285; --border:rgba(26,32,56,.14);
+  --shadow:0 10px 30px rgba(26,32,56,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Vazirmatn',Tahoma,'Segoe UI',sans-serif;
+  background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden;
+  transition:background .3s,color .3s;
+}
+.blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:float 18s ease-in-out infinite alternate}
+.blob.b1{width:420px;height:420px;background:#7c3aed;top:-120px;right:-80px}
+.blob.b2{width:380px;height:380px;background:#db2777;bottom:-100px;left:-60px;animation-delay:-6s}
+.blob.b3{width:300px;height:300px;background:#2563eb;top:35%;left:30%;animation-delay:-12s;opacity:.35}
+@keyframes float{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.12)}}
+.wrap{max-width:1080px;margin:0 auto;padding:0 14px 60px}
+header.topbar{
+  position:sticky;top:10px;z-index:50;display:flex;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--border);border-radius:999px;
+  padding:8px 12px;margin:14px 0 18px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+}
+.logo{font-weight:900;font-size:20px;white-space:nowrap;
+  background:linear-gradient(90deg,#c084fc,#f472b6,#818cf8,#c084fc);background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:200% center}}
+.spacer{flex:1}
+.lang-switch{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:999px;overflow:hidden}
+.lang-switch button{background:transparent;border:0;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;padding:7px 12px;cursor:pointer}
+.lang-switch button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;border:1px solid var(--border);cursor:pointer;
+  background:var(--surface2);color:var(--text);font-size:18px;display:flex;align-items:center;justify-content:center;
+}
+h1.title{
+  text-align:center;font-size:clamp(38px,9vw,64px);font-weight:900;line-height:1.15;margin:6px 0 4px;
+  background:linear-gradient(90deg,#c084fc,#f472b6,#818cf8,#38bdf8,#c084fc);background-size:250% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 7s linear infinite;
+}
+.subtitle{text-align:center;color:var(--muted);font-size:15px;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.stat{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 8px;text-align:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.stat::before{content:"";position:absolute;top:0;right:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3))}
+.stat b{display:block;font-size:clamp(18px,5vw,26px);font-weight:900}
+.stat span{font-size:12px;color:var(--muted)}
+.stat.links b{color:var(--green)}
+.hero{
+  position:relative;border-radius:var(--radius);overflow:hidden;margin-bottom:20px;
+  border:1px solid var(--border);box-shadow:var(--shadow);background:var(--bg2);min-height:300px;
+}
+.hero-slide{display:none;position:relative;min-height:300px}
+.hero-slide.active{display:block;animation:fade .5s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.hero-slide img{width:100%;height:340px;object-fit:cover;display:block}
+.hero-slide img.hidden{display:none}
+.hero-info{
+  position:absolute;inset:auto 0 0 0;padding:56px 18px 18px;text-align:center;
+  background:linear-gradient(transparent,rgba(0,0,0,.82));color:#fff;
+}
+.hero-info h2{font-size:clamp(20px,6vw,30px);font-weight:900}
+.hero-info p{color:#d6d9ec;font-size:14px;margin:4px 0 12px}
+.hero-badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;margin-bottom:8px}
+.hero-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;border-radius:999px;
+  padding:10px 26px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
+}
+.hero-nav{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:38px;height:38px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.45);color:#fff;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-nav.prev{inset-inline-start:10px}.hero-nav.next{inset-inline-end:10px}
+.hero-dots{position:absolute;bottom:8px;inset-inline:0;display:flex;justify-content:center;gap:6px;z-index:2}
+.hero-dots button{width:8px;height:8px;border-radius:50%;border:0;background:rgba(255,255,255,.45);cursor:pointer;padding:0}
+.hero-dots button.active{background:#fff;width:22px;border-radius:99px}
+.searchbar{display:flex;gap:8px;margin-bottom:16px}
+.searchbar input{
+  flex:1;background:var(--surface);border:1px solid var(--border);border-radius:999px;color:var(--text);
+  padding:12px 18px;font-family:inherit;font-size:15px;outline:none;backdrop-filter:blur(14px);
+}
+.searchbar input::placeholder{color:var(--muted)}
+.searchbar input:focus{border-color:var(--accent)}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tab-btn{
+  flex:1;min-width:90px;padding:11px 8px;border-radius:999px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  backdrop-filter:blur(14px);
+}
+.tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.chip{
+  padding:6px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+  color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;
+}
+.chip.active{background:var(--surface2);color:var(--text);border-color:var(--accent);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(5,1fr)}}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
+  cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--shadow);
+  transition:transform .2s;position:relative;
+}
+.card:hover{transform:translateY(-3px)}
+.card .poster{position:relative;aspect-ratio:2/3;background:linear-gradient(135deg,#312e81,#831843);display:flex;align-items:center;justify-content:center}
+.card .poster img{width:100%;height:100%;object-fit:cover;display:block}
+.card .poster img.hidden{display:none}
+.card .poster .noimg{font-size:44px;opacity:.7}
+.card .bm{
+  position:absolute;top:8px;inset-inline-end:8px;z-index:2;width:32px;height:32px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.5);color:#fff;font-size:15px;cursor:pointer;
+}
+.card .bm.on{color:var(--gold)}
+.card .body{padding:10px}
+.card h3{font-size:14px;font-weight:700;line-height:1.5;min-height:42px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .en{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:end}
+.card .meta{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.pill{font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:2px 8px;color:var(--muted)}
+.pill.rate{color:var(--gold);border-color:rgba(251,191,36,.4)}
+.badge-soon{
+  display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:11px;font-weight:700;
+  border-radius:999px;padding:3px 10px;margin-top:8px;
+}
+.pager{display:flex;gap:6px;justify-content:center;align-items:center;margin:22px 0 8px;flex-wrap:wrap}
+.pager button{
+  min-width:36px;height:36px;padding:0 10px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;cursor:pointer;
+}
+.pager button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;font-weight:700}
+.pager button:disabled{opacity:.4;cursor:default}
+.pager .info{font-size:13px;color:var(--muted);margin:0 6px}
+.empty{text-align:center;color:var(--muted);padding:40px 10px;font-size:15px}
+.guide{
+  margin-top:34px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px;backdrop-filter:blur(14px);
+}
+.guide h2{font-size:18px;margin-bottom:8px}
+.guide p{color:var(--muted);font-size:14px;line-height:2}
+.guide b{color:var(--text)}
+footer{
+  margin-top:26px;text-align:center;color:var(--muted);font-size:13px;line-height:2;
+  border-top:1px solid var(--border);padding-top:16px;
+}
+footer .warn{color:#fbbf24}
+.modal-back{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;align-items:flex-start;justify-content:center;
+  padding:20px 12px;overflow-y:auto;backdrop-filter:blur(4px);
+}
+.modal-back.open{display:flex}
+.modal{
+  width:100%;max-width:560px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;
+  overflow:hidden;box-shadow:var(--shadow);animation:pop .25s;
+}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-head{position:relative;background:linear-gradient(135deg,#312e81,#831843)}
+.modal-head img{width:100%;max-height:300px;object-fit:cover;display:block}
+.modal-head img.hidden{display:none}
+.modal-head .noimg{height:180px;display:flex;align-items:center;justify-content:center;font-size:56px;background:linear-gradient(135deg,#312e81,#831843)}
+.modal-close{
+  position:absolute;top:10px;inset-inline-start:10px;width:34px;height:34px;border-radius:50%;border:0;
+  background:rgba(0,0,0,.55);color:#fff;font-size:17px;cursor:pointer;
+}
+.modal-body{padding:18px}
+.modal-body h2{font-size:20px;font-weight:900;line-height:1.5}
+.modal-body .en{color:var(--muted);font-size:14px;direction:ltr;text-align:end;margin:2px 0 10px}
+.modal-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.sect{font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.seg button{
+  padding:7px 13px;border-radius:999px;border:1px solid var(--border);background:var(--surface);
+  color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;
+}
+.seg button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;font-weight:700}
+.qrow{
+  display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:9px 12px;margin-bottom:8px;
+}
+.qrow .ql{flex:1;font-size:14px;font-weight:700;word-break:break-word}
+.btn{
+  border:0;border-radius:999px;padding:8px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;white-space:nowrap;text-decoration:none;display:inline-block;
+}
+.btn.ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn.wide{width:100%;padding:11px;margin-top:6px}
+.btn.pack{background:linear-gradient(135deg,#059669,#34d399)}
+.ep-row{
+  display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:14px;
+}
+.ep-row span{flex:1}
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);z-index:200;
+  background:#111827;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:999px;
+  padding:11px 22px;font-size:14px;font-weight:700;transition:transform .3s;box-shadow:var(--shadow);white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+#loading,#loaderror{text-align:center;padding:70px 16px;color:var(--muted);font-size:16px;line-height:2}
+.spinner{width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 14px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+[dir="ltr"] .card .en{text-align:start}
+[dir="ltr"] .modal-body .en{text-align:start}
+</style>
+</head>
+<body>
+<div class="blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="wrap">
+  <header class="topbar">
+    <div class="logo">🎬 <span data-i18n="brand">سینما یار</span></div>
+    <div class="spacer"></div>
+    <div class="lang-switch" id="langSwitch">
+      <button data-lang="fa" class="active">فارسی</button>
+      <button data-lang="en">English</button>
+      <button data-lang="ar">العربية</button>
+    </div>
+    <button class="icon-btn" id="themeBtn" title="theme">🌙</button>
+  </header>
+
+  <h1 class="title" data-i18n="brand">سینما یار</h1>
+  <p class="subtitle" data-i18n="subtitle">دانلود فیلم و سریال با لینک مستقیم</p>
+
+  <div id="loading"><div class="spinner"></div><span data-i18n="loading">در حال بارگذاری کاتالوگ…</span></div>
+  <div id="loaderror" style="display:none">
+    <div>⚠️</div>
+    <div data-i18n="loadError">خطا در بارگذاری داده‌ها. لطفاً اتصال اینترنت را بررسی کنید و صفحه را تازه کنید.</div>
+    <br><button class="btn" onclick="location.reload()" data-i18n="retry">تلاش دوباره</button>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="stats" id="stats"></div>
+
+    <div class="hero" id="hero" style="display:none">
+      <button class="hero-nav prev" id="heroPrev" aria-label="prev">‹</button>
+      <button class="hero-nav next" id="heroNext" aria-label="next">›</button>
+      <div class="hero-dots" id="heroDots"></div>
+    </div>
+
+    <div class="searchbar">
+      <input type="search" id="searchInput" data-i18n-ph="searchPh" placeholder="جستجوی اسم فیلم یا سریال به انگلیسی… مثلاً Chicago">
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+    <div class="pager" id="pager"></div>
+
+    <div class="guide">
+      <h2 data-i18n="guideTitle">🎥 راهنمای پخش</h2>
+      <p data-i18n="guideText">برای تماشا، لینک دانلود را کپی کنید و داخل پخش‌کننده باز کنید: <b>VLC</b> یا <b>MX Player</b> در اندروید، <b>PotPlayer</b> در ویندوز. پخش‌کننده داخل صفحه وجود ندارد.</p>
+    </div>
+
+    <footer>
+      <div data-i18n="footSource">منبع لینک‌ها: فیلم ۲ مدیا (myf2ms.top)</div>
+      <div data-i18n="footDate">برداشت‌شده: ۲۰ نوامبر ۲۰۲۶</div>
+      <div class="warn" data-i18n="footWarn">⚠️ خطای 503: هنگام دانلود حتما فیلترشکن را خاموش نمایید</div>
+    </footer>
+  </div>
+</div>
+
+<div class="modal-back" id="modalBack"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+/* ================= i18n ================= */
+const I18N = {
+  fa: {
+    brand:"سینما یار", subtitle:"دانلود فیلم و سریال با لینک مستقیم",
+    loading:"در حال بارگذاری کاتالوگ…",
+    loadError:"خطا در بارگذاری داده‌ها. لطفاً اتصال اینترنت را بررسی کنید و صفحه را تازه کنید.",
+    retry:"تلاش دوباره", searchPh:"جستجوی اسم فیلم یا سریال به انگلیسی… مثلاً Chicago",
+    tabMovies:"فیلم‌ها", tabSeries:"سریال‌ها", tabAnime:"انیمیشن", tabBookmarks:"نشان‌ها",
+    statTitles:"عنوان", statMovies:"فیلم", statSeries:"سریال", statLinks:"لینک دانلود",
+    all:"همه", prev:"قبلی", next:"بعدی", page:"صفحه", of:"از",
+    heroPick:"فیلم • منتخب سردبیر", openDetails:"مشاهده و دانلود",
+    noResults:"چیزی پیدا نشد.", noBookmarks:"هنوز چیزی را نشان نکرده‌اید.",
+    comingSoon:"به‌زودی", soonNote:"این عنوان هنوز منتشر نشده و لینک دانلود ندارد.",
+    year:"سال", rating:"امتیاز", genres:"ژانر", country:"کشور",
+    download:"دانلود", copyLink:"کپی لینک", copied:"لینک کپی شد ✓",
+    copyAll:"کپی همه لینک‌ها", copiedAll:"همه لینک‌ها کپی شد ✓",
+    season:"فصل", quality:"کیفیت", episode:"قسمت", packBtn:"دانلود کل فصل",
+    playing:"در حال پخش", finished:"به اتمام رسیده",
+    guideTitle:"🎥 راهنمای پخش",
+    guideText:"برای تماشا، لینک دانلود را کپی کنید و داخل پخش‌کننده باز کنید: VLC یا MX Player در اندروید، PotPlayer در ویندوز. پخش‌کننده داخل صفحه وجود ندارد.",
+    footSource:"منبع لینک‌ها: فیلم ۲ مدیا (myf2ms.top)",
+    footDate:"برداشت‌شده: ۲۰ نوامبر ۲۰۲۶",
+    footWarn:"⚠️ خطای 503: هنگام دانلود حتما فیلترشکن را خاموش نمایید",
+    searchResults:"نتایج جستجو", bookmarked:"به نشان‌ها اضافه شد ✓", unbookmarked:"از نشان‌ها حذف شد",
+    unknownYear:"—", source:"منبع"
+  },
+  en: {
+    brand:"Cinema Yar", subtitle:"Download movies and series with direct links",
+    loading:"Loading the catalog…",
+    loadError:"Failed to load the data. Please check your connection and refresh the page.",
+    retry:"Retry", searchPh:"Search a movie or series name in English… e.g. Chicago",
+    tabMovies:"Movies", tabSeries:"Series", tabAnime:"Animation", tabBookmarks:"Bookmarks",
+    statTitles:"Titles", statMovies:"Movies", statSeries:"Series", statLinks:"Download links",
+    all:"All", prev:"Previous", next:"Next", page:"Page", of:"of",
+    heroPick:"Movie • Editor's pick", openDetails:"View & download",
+    noResults:"Nothing found.", noBookmarks:"You have not bookmarked anything yet.",
+    comingSoon:"Coming soon", soonNote:"This title is not released yet and has no download links.",
+    year:"Year", rating:"Rating", genres:"Genres", country:"Country",
+    download:"Download", copyLink:"Copy link", copied:"Link copied ✓",
+    copyAll:"Copy all links", copiedAll:"All links copied ✓",
+    season:"Season", quality:"Quality", episode:"Episode", packBtn:"Download whole season",
+    playing:"Ongoing", finished:"Finished",
+    guideTitle:"🎥 Playback guide",
+    guideText:"To watch, copy a download link and open it in a player: VLC or MX Player on Android, PotPlayer on Windows. There is no in-page player.",
+    footSource:"Link source: Film2Media (myf2ms.top)",
+    footDate:"Scraped: 20 November 2026",
+    footWarn:"⚠️ 503 error: turn off your VPN while downloading",
+    searchResults:"Search results", bookmarked:"Added to bookmarks ✓", unbookmarked:"Removed from bookmarks",
+    unknownYear:"—", source:"Source"
+  },
+  ar: {
+    brand:"سينما يار", subtitle:"تحميل الأفلام والمسلسلات بروابط مباشرة",
+    loading:"جارٍ تحميل الكتالوج…",
+    loadError:"تعذّر تحميل البيانات. تحقق من الاتصال وحدّث الصفحة.",
+    retry:"إعادة المحاولة", searchPh:"ابحث عن اسم فيلم أو مسلسل بالإنجليزية… مثل Chicago",
+    tabMovies:"أفلام", tabSeries:"مسلسلات", tabAnime:"أنيميشن", tabBookmarks:"المحفوظات",
+    statTitles:"عنوان", statMovies:"فيلم", statSeries:"مسلسل", statLinks:"رابط تحميل",
+    all:"الكل", prev:"السابق", next:"التالي", page:"صفحة", of:"من",
+    heroPick:"فيلم • اختيار المحرر", openDetails:"عرض وتحميل",
+    noResults:"لم يتم العثور على شيء.", noBookmarks:"لم تحفظ أي شيء بعد.",
+    comingSoon:"قريبًا", soonNote:"هذا العنوان لم يُصدر بعد ولا توجد روابط تحميل.",
+    year:"السنة", rating:"التقييم", genres:"النوع", country:"البلد",
+    download:"تحميل", copyLink:"نسخ الرابط", copied:"تم نسخ الرابط ✓",
+    copyAll:"نسخ كل الروابط", copiedAll:"تم نسخ كل الروابط ✓",
+    season:"الموسم", quality:"الجودة", episode:"الحلقة", packBtn:"تحميل الموسم كاملًا",
+    playing:"يُعرض الآن", finished:"انتهى",
+    guideTitle:"🎥 دليل التشغيل",
+    guideText:"للمشاهدة، انسخ رابط التحميل وافتحه في مشغّل: VLC أو MX Player على أندرويد، وPotPlayer على ويندوز. لا يوجد مشغّل داخل الصفحة.",
+    footSource:"مصدر الروابط: فيلم ٢ ميديا (myf2ms.top)",
+    footDate:"تم الجمع: ٢٠ نوفمبر ٢٠٢٦",
+    footWarn:"⚠️ خطأ 503: أوقف الـVPN أثناء التحميل",
+    searchResults:"نتائج البحث", bookmarked:"أُضيف إلى المحفوظات ✓", unbookmarked:"أُزيل من المحفوظات",
+    unknownYear:"—", source:"المصدر"
+  }
+};
+const LOCALES = {fa:"fa-IR", en:"en-US", ar:"ar-EG"};
+let lang = localStorage.getItem("cy-lang") || "fa";
+let theme = localStorage.getItem("cy-theme") || "dark";
+const t = k => (I18N[lang] && I18N[lang][k]) || I18N.fa[k] || k;
+const num = n => Number(n || 0).toLocaleString(LOCALES[lang] || "fa-IR");
+const esc = s => String(s == null ? "" : s)
+  .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+/* ================= state ================= */
+let CATALOG = [];
+let state = {tab:"movies", page:1, genre:"all", query:"", view:"home"};
+let bookmarks = new Set(JSON.parse(localStorage.getItem("cy-bookmarks") || "[]"));
+let heroIdx = 0, heroTimer = null, heroItems = [];
+let modalItem = null, modalSeason = 0, modalQuality = 0;
+
+const $ = s => document.querySelector(s);
+const grid = $("#grid"), pager = $("#pager"), chipsBox = $("#chips"), tabsBox = $("#tabs");
+
+function linkCount(it){
+  return (it.qualities || []).length + (it.seasons || []).reduce((a, s) =>
+    a + (s.qualities || []).reduce((b, q) =>
+      b + (q.episodes || []).length + (q.pack ? 1 : 0), 0), 0);
+}
+function isComingSoon(it){ return linkCount(it) === 0; }
+function displayName(it){ return it.fa_name || it.en_title || it.title || ""; }
+
+/* ================= theme + language ================= */
+function applyTheme(){
+  document.documentElement.dataset.theme = theme;
+  $("#themeBtn").textContent = theme === "dark" ? "🌙" : "☀️";
+  localStorage.setItem("cy-theme", theme);
+}
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang === "en") ? "ltr" : "rtl";
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll("#langSwitch button").forEach(b =>
+    b.classList.toggle("active", b.dataset.lang === lang));
+  localStorage.setItem("cy-lang", lang);
+  renderAll();
+}
+$("#themeBtn").addEventListener("click", () => { theme = theme === "dark" ? "light" : "dark"; applyTheme(); });
+document.querySelectorAll("#langSwitch button").forEach(b =>
+  b.addEventListener("click", () => { lang = b.dataset.lang; applyLang(); }));
+
+/* ================= toast + clipboard ================= */
+let toastTimer = null;
+function toast(msg){
+  const el = $("#toast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
+}
+function copyText(txt, msg){
+  const done = () => toast(msg || t("copied"));
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(() => fallbackCopy(txt, done));
+  } else fallbackCopy(txt, done);
+}
+function fallbackCopy(txt, done){
+  const ta = document.createElement("textarea");
+  ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta); done();
+}
+
+/* ================= filtering ================= */
+function tabItems(tab){
+  if (tab === "movies") return CATALOG.filter(i => i.kind === "movie" && !i.anime_archive);
+  if (tab === "series") return CATALOG.filter(i => i.kind === "series" && !i.anime_archive);
+  return CATALOG.filter(i => (i.genres || []).some(g => g === "انیمه" || g === "انیمیشن"));
+}
+function currentList(){
+  if (state.view === "bookmarks") return CATALOG.filter(i => bookmarks.has(i.url));
+  if (state.query) {
+    const q = state.query.trim().toLowerCase();
+    return CATALOG.filter(i =>
+      (i.title || "").toLowerCase().includes(q) ||
+      (i.en_title || "").toLowerCase().includes(q) ||
+      (i.fa_name || "").toLowerCase().includes(q));
+  }
+  let list = tabItems(state.tab);
+  if (state.genre !== "all") list = list.filter(i => (i.genres || []).includes(state.genre));
+  return list;
+}
+function tabGenres(tab){
+  const seen = new Map();
+  tabItems(tab).forEach(i => (i.genres || []).forEach(g => {
+    if (g) seen.set(g, (seen.get(g) || 0) + 1);
+  }));
+  return [...seen.entries()].sort((a, b) => b[1] - a[1]).map(e => e[0]);
+}
+
+/* ================= rendering ================= */
+function renderStats(){
+  const movies = CATALOG.filter(i => i.kind === "movie").length;
+  const series = CATALOG.filter(i => i.kind === "series").length;
+  const links = CATALOG.reduce((a, i) => a + linkCount(i), 0);
+  $("#stats").innerHTML = [
+    [num(CATALOG.length), t("statTitles")],
+    [num(movies), t("statMovies")],
+    [num(series), t("statSeries")],
+    [num(links), t("statLinks")]
+  ].map(([v, l], i) =>
+    `<div class="stat${i === 3 ? " links" : ""}"><b>${v}</b><span>${esc(l)}</span></div>`).join("");
+}
+function renderTabs(){
+  const tabs = [
+    ["movies", t("tabMovies"), tabItems("movies").length],
+    ["series", t("tabSeries"), tabItems("series").length],
+    ["anime", t("tabAnime"), tabItems("anime").length],
+    ["bookmarks", "🔖 " + t("tabBookmarks"), bookmarks.size]
+  ];
+  tabsBox.innerHTML = tabs.map(([key, label, n]) =>
+    `<button class="tab-btn${(state.view === "bookmarks" ? "bookmarks" : state.tab) === key ? " active" : ""}" data-tab="${key}">${esc(label)} (${num(n)})</button>`).join("");
+  tabsBox.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    if (b.dataset.tab === "bookmarks"){ state.view = "bookmarks"; }
+    else { state.view = "home"; state.tab = b.dataset.tab; }
+    state.page = 1; state.genre = "all";
+    renderAll();
+  }));
+}
+function renderChips(){
+  if (state.view !== "home" || state.query){ chipsBox.innerHTML = ""; return; }
+  const genres = tabGenres(state.tab);
+  if (!genres.length){ chipsBox.innerHTML = ""; return; }
+  chipsBox.innerHTML = `<button class="chip${state.genre === "all" ? " active" : ""}" data-g="all">${esc(t("all"))}</button>` +
+    genres.map(g => `<button class="chip${state.genre === g ? " active" : ""}" data-g="${esc(g)}">${esc(g)}</button>`).join("");
+  chipsBox.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    state.genre = b.dataset.g; state.page = 1; renderAll();
+  }));
+}
+function cardHTML(it){
+  const soon = isComingSoon(it);
+  const bm = bookmarks.has(it.url);
+  const genres = (it.genres || []).slice(0, 2).map(g => `<span class="pill">${esc(g)}</span>`).join("");
+  return `<article class="card" data-url="${esc(it.url)}">
+    <div class="poster">${it.poster
+      ? `<img src="${esc(it.poster)}" alt="" loading="lazy" onerror="this.classList.add('hidden')">`
+      : `<span class="noimg">🎬</span>`}
+      <button class="bm${bm ? " on" : ""}" data-bm="${esc(it.url)}" aria-label="bookmark">${bm ? "★" : "☆"}</button>
+    </div>
+    <div class="body">
+      <h3>${esc(displayName(it))}</h3>
+      <div class="en">${esc(it.en_title || "")}</div>
+      <div class="meta">
+        <span class="pill">${it.year ? num(it.year) : esc(t("unknownYear"))}</span>
+        ${it.rating ? `<span class="pill rate">★ ${num(it.rating)}/10</span>` : ""}
+        ${genres}
+      </div>
+      ${soon ? `<span class="badge-soon">${esc(t("comingSoon"))}</span>` : ""}
+    </div>
+  </article>`;
+}
+function renderGrid(){
+  const list = currentList();
+  const per = 10, pages = Math.max(1, Math.ceil(list.length / per));
+  if (state.page > pages) state.page = pages;
+  const slice = list.slice((state.page - 1) * per, state.page * per);
+  if (!slice.length){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">${esc(state.view === "bookmarks" ? t("noBookmarks") : t("noResults"))}</div>`;
+  } else {
+    grid.innerHTML = slice.map(cardHTML).join("");
+    grid.querySelectorAll(".card").forEach(c => c.addEventListener("click", e => {
+      if (e.target.closest("[data-bm]")) return;
+      openModal(c.dataset.url);
+    }));
+    grid.querySelectorAll("[data-bm]").forEach(b => b.addEventListener("click", e => {
+      e.stopPropagation();
+      toggleBookmark(b.dataset.bm);
+    }));
+  }
+  renderPager(pages);
+}
+function renderPager(pages){
+  if (pages <= 1){ pager.innerHTML = pages > 0 ? `<span class="info">${esc(t("page"))} ${num(1)} ${esc(t("of"))} ${num(1)}</span>` : ""; return; }
+  let nums = [];
+  const win = [1, pages, state.page - 1, state.page, state.page + 1];
+  for (let p = 1; p <= pages; p++) if (win.includes(p) && !nums.includes(p)) nums.push(p);
+  nums.sort((a, b) => a - b);
+  let html = `<button data-p="prev" ${state.page === 1 ? "disabled" : ""}>${esc(t("prev"))}</button>`;
+  let last = 0;
+  nums.forEach(p => {
+    if (p - last > 1) html += `<span class="info">…</span>`;
+    html += `<button data-p="${p}" class="${p === state.page ? "active" : ""}">${num(p)}</button>`;
+    last = p;
+  });
+  html += `<button data-p="next" ${state.page === pages ? "disabled" : ""}>${esc(t("next"))}</button>`;
+  html += `<span class="info">${esc(t("page"))} ${num(state.page)} ${esc(t("of"))} ${num(pages)}</span>`;
+  pager.innerHTML = html;
+  pager.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    const v = b.dataset.p;
+    if (v === "prev") state.page = Math.max(1, state.page - 1);
+    else if (v === "next") state.page = Math.min(pages, state.page + 1);
+    else state.page = parseInt(v, 10);
+    renderAll();
+    window.scrollTo({top: $("#grid").offsetTop - 140, behavior: "smooth"});
+  }));
+}
+function toggleBookmark(url){
+  if (bookmarks.has(url)){ bookmarks.delete(url); toast(t("unbookmarked")); }
+  else { bookmarks.add(url); toast(t("bookmarked")); }
+  localStorage.setItem("cy-bookmarks", JSON.stringify([...bookmarks]));
+  renderAll();
+}
+
+/* ================= hero carousel ================= */
+function buildHero(){
+  heroItems = CATALOG.filter(i => (i.section || "").includes("2026")).slice(0, 14);
+  if (!heroItems.length) heroItems = CATALOG.slice(0, 14);
+  const hero = $("#hero");
+  hero.querySelectorAll(".hero-slide").forEach(s => s.remove());
+  heroItems.forEach((it, idx) => {
+    const slide = document.createElement("div");
+    slide.className = "hero-slide" + (idx === 0 ? " active" : "");
+    slide.innerHTML = `${it.poster
+      ? `<img src="${esc(it.poster)}" alt="" onerror="this.classList.add('hidden')">` : ""}
+      <div class="hero-info">
+        <span class="hero-badge">${esc(t("heroPick"))}</span>
+        <h2>${esc(displayName(it))}</h2>
+        <p>${esc(it.en_title || "")} · ${it.year ? num(it.year) : ""}${it.rating ? " · ★ " + num(it.rating) + "/10" : ""}</p>
+        <button class="hero-btn" data-open="${esc(it.url)}">${esc(t("openDetails"))}</button>
+      </div>`;
+    hero.insertBefore(slide, hero.querySelector(".hero-dots"));
+    slide.querySelector("[data-open]").addEventListener("click", () => openModal(it.url));
+  });
+  $("#heroDots").innerHTML = heroItems.map((_, i) =>
+    `<button data-d="${i}" class="${i === 0 ? "active" : ""}" aria-label="slide ${i + 1}"></button>`).join("");
+  $("#heroDots").querySelectorAll("button").forEach(b =>
+    b.addEventListener("click", () => showSlide(parseInt(b.dataset.d, 10))));
+  hero.style.display = "";
+  startHeroTimer();
+}
+function showSlide(i){
+  heroIdx = (i + heroItems.length) % heroItems.length;
+  document.querySelectorAll(".hero-slide").forEach((s, j) => s.classList.toggle("active", j === heroIdx));
+  document.querySelectorAll("#heroDots button").forEach((d, j) => d.classList.toggle("active", j === heroIdx));
+}
+function startHeroTimer(){
+  clearInterval(heroTimer);
+  heroTimer = setInterval(() => showSlide(heroIdx + 1), 5000);
+}
+$("#heroPrev").addEventListener("click", () => { showSlide(heroIdx - 1); startHeroTimer(); });
+$("#heroNext").addEventListener("click", () => { showSlide(heroIdx + 1); startHeroTimer(); });
+
+/* ================= search ================= */
+let searchTimer = null;
+$("#searchInput").addEventListener("input", e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    state.query = e.target.value;
+    state.page = 1;
+    renderAll();
+  }, 300);
+});
+
+function renderAll(){
+  if (!CATALOG.length) return;
+  renderStats(); renderTabs(); renderChips(); renderGrid();
+}
+
+/* ================= detail modal ================= */
+function openModal(url){
+  const it = CATALOG.find(x => x.url === url);
+  if (!it) return;
+  modalItem = it; modalSeason = 0; modalQuality = 0;
+  renderModal();
+  $("#modalBack").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeModal(){
+  $("#modalBack").classList.remove("open");
+  document.body.style.overflow = "";
+  modalItem = null;
+}
+$("#modalBack").addEventListener("click", e => { if (e.target.id === "modalBack") closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+function renderModal(){
+  const it = modalItem;
+  if (!it) return;
+  const soon = isComingSoon(it);
+  let html = `<div class="modal-head">
+    ${it.poster
+      ? `<img src="${esc(it.poster)}" alt="" onerror="this.classList.add('hidden')">`
+      : `<div class="noimg">🎬</div>`}
+    <button class="modal-close" id="mClose">✕</button>
+  </div><div class="modal-body">
+    <h2>${esc(displayName(it))}</h2>
+    <div class="en">${esc(it.en_title || "")}</div>
+    <div class="modal-meta">
+      <span class="pill">${esc(t("year"))}: ${it.year ? num(it.year) : esc(t("unknownYear"))}</span>
+      ${it.rating ? `<span class="pill rate">★ ${num(it.rating)}/10</span>` : ""}
+      ${it.country ? `<span class="pill">${esc(it.country)}</span>` : ""}
+      ${(it.genres || []).map(g => `<span class="pill">${esc(g)}</span>`).join("")}
+      ${soon ? `<span class="badge-soon">${esc(t("comingSoon"))}</span>` : ""}
+    </div>`;
+  if (soon){
+    html += `<p style="color:var(--muted);line-height:1.9">${esc(t("soonNote"))}</p>`;
+  } else if (it.kind === "movie"){
+    html += `<div class="sect">${esc(t("download"))}</div>` +
+      (it.qualities || []).map(q =>
+        `<div class="qrow"><span class="ql">${esc(q.label)}</span>
+          <a class="btn" href="${esc(q.url)}" target="_blank" rel="noopener">${esc(t("download"))}</a>
+          <button class="btn ghost" data-copy="${esc(q.url)}">${esc(t("copyLink"))}</button>
+        </div>`).join("");
+  } else {
+    const seasons = it.seasons || [];
+    html += `<div class="sect">${esc(t("season"))}</div><div class="seg" id="mSeasons">` +
+      seasons.map((s, i) =>
+        `<button data-s="${i}" class="${i === modalSeason ? "active" : ""}">${esc(s.name)}${s.status ? " · " + esc(s.status === "در حال پخش" ? t("playing") : s.status === "به اتمام رسیده" ? t("finished") : s.status) : ""}</button>`).join("") +
+      `</div>`;
+    const season = seasons[modalSeason];
+    if (season){
+      const quals = season.qualities || [];
+      if (modalQuality >= quals.length) modalQuality = 0;
+      html += `<div class="sect">${esc(t("quality"))}</div><div class="seg" id="mQuals">` +
+        quals.map((q, i) =>
+          `<button data-q="${i}" class="${i === modalQuality ? "active" : ""}">${esc(q.label)}</button>`).join("") +
+        `</div>`;
+      const q = quals[modalQuality];
+      if (q){
+        if (q.pack){
+          html += `<button class="btn pack wide" data-copy="${esc(q.pack)}">📥 ${esc(t("packBtn"))} · ${esc(q.label)}</button>`;
+        }
+        const eps = q.episodes || [];
+        if (eps.length){
+          html += `<button class="btn wide" id="mCopyAll">${esc(t("copyAll"))} (${num(eps.length)})</button>`;
+          html += `<div class="sect">${esc(t("episode"))}</div>` +
+            eps.map(e => `<div class="ep-row"><span>${esc(t("episode"))} ${e.ep == null ? "?" : num(e.ep)}</span>
+              <button class="btn ghost" data-copy="${esc(e.url)}">${esc(t("copyLink"))}</button></div>`).join("");
+        }
+      }
+    }
+  }
+  html += `<div style="margin-top:16px"><a href="${esc(it.url)}" target="_blank" rel="noopener" style="color:var(--muted);font-size:13px">${esc(t("source"))} ↗</a></div>`;
+  html += `</div>`;
+  $("#modal").innerHTML = html;
+  $("#mClose").addEventListener("click", closeModal);
+  $("#modal").querySelectorAll("[data-copy]").forEach(b =>
+    b.addEventListener("click", () => copyText(b.dataset.copy)));
+  const copyAll = $("#mCopyAll");
+  if (copyAll) copyAll.addEventListener("click", () => {
+    const season = (it.seasons || [])[modalSeason];
+    const q = season && (season.qualities || [])[modalQuality];
+    if (q) copyText((q.episodes || []).map(e => e.url).join("\n"), t("copiedAll"));
+  });
+  const sBox = $("#mSeasons");
+  if (sBox) sBox.querySelectorAll("button").forEach(b =>
+    b.addEventListener("click", () => { modalSeason = parseInt(b.dataset.s, 10); modalQuality = 0; renderModal(); }));
+  const qBox = $("#mQuals");
+  if (qBox) qBox.querySelectorAll("button").forEach(b =>
+    b.addEventListener("click", () => { modalQuality = parseInt(b.dataset.q, 10); renderModal(); }));
+}
+
+/* ================= data loading ================= */
+async function loadCatalog(){
+  try {
+    const parts = await Promise.all(
+      Array.from({length: 8}, (_, i) => i + 1).map(n =>
+        fetch("data-" + n + ".json").then(r => {
+          if (!r.ok) throw new Error("chunk " + n + " HTTP " + r.status);
+          return r.json();
+        })));
+    CATALOG = parts.flatMap(p => p.items || []);
+    if (!CATALOG.length) throw new Error("empty catalog");
+    $("#loading").style.display = "none";
+    $("#app").style.display = "";
+    applyTheme();
+    applyLang();
+    buildHero();
+  } catch (err){
+    console.error(err);
+    $("#loading").style.display = "none";
+    $("#loaderror").style.display = "";
+  }
+}
+applyTheme();
+loadCatalog();
+</script>
+</body>
+</html>
