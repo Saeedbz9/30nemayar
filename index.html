@@ -313,6 +313,44 @@ footer .warn{color:#fbbf24}
 @keyframes spin{to{transform:rotate(360deg)}}
 [dir="ltr"] .card .en{text-align:start}
 [dir="ltr"] .modal-body .en{text-align:start}
+/* ================= TV / remote mode: only when body.tv ================= */
+body.tv{font-size:20px}
+body.tv .wrap{max-width:1560px}
+body.tv .grid{grid-template-columns:repeat(4,1fr);gap:20px}
+body.tv .row-strip{grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+body.tv h1.title{font-size:clamp(46px,9vw,76px)}
+body.tv .subtitle{font-size:19px}
+body.tv .card h3{font-size:19px;min-height:58px}
+body.tv .card .en{font-size:14px}
+body.tv .card .body{padding:16px}
+body.tv .card .meta .pill{font-size:14px}
+body.tv .chip{font-size:17px;padding:10px 18px}
+body.tv .cat-head h2{font-size:23px}
+body.tv .view-all{font-size:15px;padding:9px 18px}
+body.tv .news-card h3{font-size:20px}
+body.tv .news-card p{font-size:16px}
+body.tv .news-card .nmeta{font-size:14px}
+body.tv .modal{max-width:900px}
+body.tv .modal-body{padding:26px}
+body.tv .modal-body h2{font-size:26px}
+body.tv .modal-body .en{font-size:17px}
+body.tv .modal-close{width:54px;height:54px;font-size:25px}
+body.tv .plot{font-size:18px}
+body.tv .btn{font-size:17px;padding:12px 20px}
+body.tv .seg button{font-size:16px;padding:10px 16px}
+body.tv .qrow .ql{font-size:17px}
+body.tv .ep-row{font-size:17px}
+body.tv .sheet input{font-size:19px;padding:16px 20px}
+body.tv .sheet-head b{font-size:21px}
+body.tv .dock{width:min(900px,calc(100% - 32px));padding:14px 12px}
+body.tv .dock button{font-size:30px;padding:8px 0}
+body.tv .dock button span{font-size:15px}
+body.tv .dock-fab{flex:0 0 84px !important;width:84px;height:84px;font-size:34px !important;margin-top:-38px}
+body.tv .hero-info h2{font-size:36px}
+body.tv .hero-info p{font-size:18px}
+body.tv .hero-btn{font-size:18px;padding:14px 32px}
+body.tv :focus{outline:4px solid #ff4fd8 !important;outline-offset:3px}
+body.tv .card:focus{transform:scale(1.03)}
 </style>
 </head>
 <body>
@@ -387,6 +425,11 @@ footer .warn{color:#fbbf24}
 <div class="toast" id="toast"></div>
 <script>
 "use strict";
+/* ================= TV / remote mode (only ?tv=1 or a TV user agent) ================= */
+const TV_MODE = new URLSearchParams(location.search).has("tv") ||
+  /Leanback|Android TV/i.test(navigator.userAgent || "");
+if (TV_MODE) document.body.classList.add("tv");
+let lastFocus = null;
 /* ================= i18n ================= */
 const I18N = {
   fa: {
@@ -641,7 +684,7 @@ function cardHTML(it){
   const soon = isComingSoon(it);
   const bm = bookmarks.has(it.url);
   const genres = (it.genres || []).slice(0, 2).map(g => `<span class="pill">${esc(g)}</span>`).join("");
-  return `<article class="card" data-url="${esc(it.url)}">
+  return `<article class="card" data-url="${esc(it.url)}" tabindex="0">
     <div class="poster">${it.poster
       ? `<img src="${esc(it.poster)}" alt="" loading="lazy" onerror="this.classList.add('hidden')">`
       : `<span class="noimg">🎬</span>`}
@@ -820,7 +863,7 @@ function renderNewsView(){
     return;
   }
   grid.innerHTML = `<div style="grid-column:1/-1"><h2 style="margin:4px 0 12px">📰 ${esc(t("newsTitle"))}</h2>` +
-    NEWS.items.map(n => `<article class="news-card" data-link="${esc(n.link)}">
+    NEWS.items.map(n => `<article class="news-card" data-link="${esc(n.link)}" tabindex="0">
       <h3>${esc(n.title_fa)}</h3>
       ${n.desc_fa ? `<p>${esc(n.desc_fa)}</p>` : ""}
       <div class="nmeta"><span>${esc(n.source || "")}</span><span>${esc(newsDate(n.pub))}</span><span>${esc(t("readMore"))} ↗</span></div>
@@ -883,18 +926,44 @@ function renderUserView(){
 function openModal(url){
   const it = CATALOG.find(x => x.url === url);
   if (!it) return;
+  if (TV_MODE) lastFocus = document.activeElement;
   modalItem = it; modalSeason = 0; modalQuality = 0;
   renderModal();
   $("#modalBack").classList.add("open");
   document.body.style.overflow = "hidden";
+  if (TV_MODE){
+    const mc = document.getElementById("mClose");
+    if (mc) mc.focus();
+  }
 }
 function closeModal(){
   $("#modalBack").classList.remove("open");
   document.body.style.overflow = "";
   modalItem = null;
+  if (TV_MODE && lastFocus && document.contains(lastFocus)){
+    lastFocus.focus();
+    lastFocus = null;
+  }
 }
 $("#modalBack").addEventListener("click", e => { if (e.target.id === "modalBack") closeModal(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+document.addEventListener("keydown", e => {
+  const code = e.keyCode || e.which || 0;
+  if (e.key === "Escape" || code === 27){
+    if ($("#modalBack").classList.contains("open")) closeModal();
+    else if (TV_MODE && $("#searchSheet").classList.contains("open")) closeSheet();
+    return;
+  }
+  if (!TV_MODE) return;
+  /* TV remote: Enter/Space activates a focused div-based item (cards, news cards).
+     Native buttons/inputs/links already handle Enter/Space themselves. */
+  if (e.key === "Enter" || e.key === " " || e.key === "Spacebar" || code === 13 || code === 32){
+    const el = document.activeElement;
+    if (el && el !== document.body && !/^(BUTTON|INPUT|A|TEXTAREA|SELECT)$/.test(el.tagName)){
+      e.preventDefault();
+      el.click();
+    }
+  }
+});
 
 function renderModal(){
   const it = modalItem;
