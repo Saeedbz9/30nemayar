@@ -247,6 +247,11 @@ footer .warn{color:#fbbf24}
   font-size:24px !important;justify-content:center !important;
   margin-top:-26px;box-shadow:0 8px 20px rgba(168,85,247,.5);border:2px solid rgba(255,255,255,.35) !important;
 }
+.plot{color:var(--muted);line-height:1.9;margin:6px 0 12px;font-size:14px}
+.news-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:12px;cursor:pointer}
+.news-card h3{font-size:15px;line-height:1.8;margin:0 0 6px}
+.news-card p{color:var(--muted);font-size:13px;line-height:1.9;margin:0 0 8px}
+.news-card .nmeta{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
 .sheet-back{
   position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;display:none;
   align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);
@@ -348,6 +353,7 @@ footer .warn{color:#fbbf24}
   <button data-dock="series"><span class="ic">📺</span><span data-i18n="tabSeries">سریال‌ها</span></button>
   <button class="dock-fab" id="searchFab" aria-label="search">🔍</button>
   <button data-dock="anime"><span class="ic">✨</span><span data-i18n="tabAnime">انیمیشن</span></button>
+  <button data-dock="news"><span class="ic">📰</span><span data-i18n="tabNews">اخبار</span></button>
   <button data-dock="home"><span class="ic">🏠</span><span data-i18n="tabHome">صفحه اصلی</span></button>
 </nav>
 
@@ -371,7 +377,8 @@ const I18N = {
     loading:"در حال بارگذاری کاتالوگ…",
     loadError:"خطا در بارگذاری داده‌ها. لطفاً اتصال اینترنت را بررسی کنید و صفحه را تازه کنید.",
     retry:"تلاش دوباره", searchPh:"جستجوی اسم فیلم یا سریال به انگلیسی… مثلاً Chicago",
-    tabMovies:"فیلم‌ها", tabSeries:"سریال‌ها", tabAnime:"انیمیشن", tabBookmarks:"نشان‌ها", tabUser:"کاربر", tabHome:"صفحه اصلی",
+    tabMovies:"فیلم‌ها", tabSeries:"سریال‌ها", tabAnime:"انیمیشن", tabBookmarks:"نشان‌ها", tabUser:"کاربر", tabHome:"صفحه اصلی", tabNews:"اخبار",
+    plot:"خلاصه داستان", newsTitle:"آخرین اخبار سینما", newsEmpty:"خبر تازه‌ای در دسترس نیست", readMore:"خواندن خبر",
     searchTitle:"جستجو", registerTitle:"ثبت‌نام", registerText:"با ایمیل و شماره موبایلت ثبت‌نام کن تا نشان‌هایت روی همین گوشی ذخیره بماند.",
     emailPh:"ایمیل", phonePh:"شماره موبایل", registerBtn:"ثبت‌نام", logout:"خروج از حساب",
     yourBookmarks:"نشان‌های من", welcomeUser:"خوش برگشتی 👋", invalidEmail:"ایمیل معتبر نیست", invalidPhone:"شماره موبایل معتبر نیست", registered:"ثبت‌نام انجام شد ✓",
@@ -396,7 +403,8 @@ const I18N = {
     loading:"Loading the catalog…",
     loadError:"Failed to load the data. Please check your connection and refresh the page.",
     retry:"Retry", searchPh:"Search a movie or series name in English… e.g. Chicago",
-    tabMovies:"Movies", tabSeries:"Series", tabAnime:"Animation", tabBookmarks:"Bookmarks", tabUser:"Account", tabHome:"Home",
+    tabMovies:"Movies", tabSeries:"Series", tabAnime:"Animation", tabBookmarks:"Bookmarks", tabUser:"Account", tabHome:"Home", tabNews:"News",
+    plot:"Synopsis", newsTitle:"Latest cinema news", newsEmpty:"No news available right now", readMore:"Read more",
     searchTitle:"Search", registerTitle:"Sign up", registerText:"Sign up with your email and phone number to keep your bookmarks saved on this device.",
     emailPh:"Email", phonePh:"Phone number", registerBtn:"Sign up", logout:"Log out",
     yourBookmarks:"My bookmarks", welcomeUser:"Welcome back 👋", invalidEmail:"Invalid email", invalidPhone:"Invalid phone number", registered:"Signed up ✓",
@@ -421,7 +429,8 @@ const I18N = {
     loading:"جارٍ تحميل الكتالوج…",
     loadError:"تعذّر تحميل البيانات. تحقق من الاتصال وحدّث الصفحة.",
     retry:"إعادة المحاولة", searchPh:"ابحث عن اسم فيلم أو مسلسل بالإنجليزية… مثل Chicago",
-    tabMovies:"أفلام", tabSeries:"مسلسلات", tabAnime:"أنيميشن", tabBookmarks:"المحفوظات", tabUser:"الحساب", tabHome:"الرئيسية",
+    tabMovies:"أفلام", tabSeries:"مسلسلات", tabAnime:"أنيميشن", tabBookmarks:"المحفوظات", tabUser:"الحساب", tabHome:"الرئيسية", tabNews:"الأخبار",
+    plot:"ملخص القصة", newsTitle:"آخر أخبار السينما", newsEmpty:"لا توجد أخبار متاحة حالياً", readMore:"قراءة الخبر",
     searchTitle:"بحث", registerTitle:"التسجيل", registerText:"سجّل ببريدك الإلكتروني ورقم هاتفك ليبقى محفوظاتك على هذا الجهاز.",
     emailPh:"البريد الإلكتروني", phonePh:"رقم الهاتف", registerBtn:"تسجيل", logout:"تسجيل الخروج",
     yourBookmarks:"محفوظاتي", welcomeUser:"أهلاً بعودتك 👋", invalidEmail:"البريد الإلكتروني غير صحيح", invalidPhone:"رقم الهاتف غير صحيح", registered:"تم التسجيل ✓",
@@ -539,12 +548,13 @@ function tabGenres(tab){
 /* ================= rendering ================= */
 function renderDock(){
   const landing = state.view === "home" && state.tab === "movies" && state.page === 1 && state.genre === "all" && !state.query;
-  const active = landing ? "home" : state.tab;
+  const active = state.view === "news" ? "news" : (landing ? "home" : state.tab);
   document.querySelectorAll("#dock [data-dock]").forEach(b =>
     b.classList.toggle("active", b.dataset.dock === active));
 }
 document.querySelectorAll("#dock [data-dock]").forEach(b => b.addEventListener("click", () => {
   const key = b.dataset.dock;
+  if (key === "news"){ state.view = "news"; renderAll(); window.scrollTo({top: 0, behavior: "smooth"}); return; }
   state.view = "home";
   state.tab = key === "home" ? "movies" : key;
   state.page = 1; state.genre = "all"; state.query = "";
@@ -720,7 +730,34 @@ function renderAll(){
   if (!CATALOG.length) return;
   renderDock(); renderChips();
   if (state.view === "user") renderUserView();
+  else if (state.view === "news") renderNewsView();
   else renderGrid();
+}
+
+/* ================= news view ================= */
+let NEWS = null;
+function newsDate(pub){
+  try {
+    const d = new Date(pub);
+    if (isNaN(d)) return "";
+    const loc = document.documentElement.lang === "fa" ? "fa-IR" : document.documentElement.lang === "ar" ? "ar-EG" : "en-US";
+    return d.toLocaleDateString(loc, {year: "numeric", month: "short", day: "numeric"});
+  } catch (e){ return ""; }
+}
+function renderNewsView(){
+  pager.innerHTML = "";
+  chipsBox.innerHTML = "";
+  if (!NEWS || !NEWS.items || !NEWS.items.length){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">${esc(t("newsEmpty"))}</div>`;
+    return;
+  }
+  grid.innerHTML = `<div style="grid-column:1/-1"><h2 style="margin:4px 0 12px">📰 ${esc(t("newsTitle"))}</h2>` +
+    NEWS.items.map(n => `<article class="news-card" data-link="${esc(n.link)}">
+      <h3>${esc(n.title_fa)}</h3>
+      ${n.desc_fa ? `<p>${esc(n.desc_fa)}</p>` : ""}
+      <div class="nmeta"><span>${esc(n.source || "")}</span><span>${esc(newsDate(n.pub))}</span><span>${esc(t("readMore"))} ↗</span></div>
+    </article>`).join("") + `</div>`;
+  grid.querySelectorAll(".news-card").forEach(c => c.addEventListener("click", () => window.open(c.dataset.link, "_blank", "noopener")));
 }
 
 /* ================= user view ================= */
@@ -810,6 +847,9 @@ function renderModal(){
       ${(it.genres || []).map(g => `<span class="pill">${esc(g)}</span>`).join("")}
       ${soon ? `<span class="badge-soon">${esc(t("comingSoon"))}</span>` : ""}
     </div>`;
+  if (it.plot){
+    html += `<div class="sect">${esc(t("plot"))}</div><p class="plot">${esc(it.plot)}</p>`;
+  }
   if (soon){
     html += `<p style="color:var(--muted);line-height:1.9">${esc(t("soonNote"))}</p>`;
   } else if (it.kind === "movie"){
@@ -878,6 +918,7 @@ async function loadCatalog(){
         })));
     CATALOG = parts.flatMap(p => p.items || []);
     if (!CATALOG.length) throw new Error("empty catalog");
+    fetch("news.json").then(r => r.ok ? r.json() : null).then(j => { if (j && j.items) NEWS = j; }).catch(() => {});
     $("#loading").style.display = "none";
     $("#app").style.display = "";
     applyTheme();
